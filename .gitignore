@@ -1,0 +1,22 @@
+# venvs
+.venv/
+venv/
+env/
+
+# OS cruft
+.DS_Store
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+
+mlruns/
+artifacts/
+data/raw/
+data/processed/
+
+
+!src/serving/model/
+!src/serving/model/**
