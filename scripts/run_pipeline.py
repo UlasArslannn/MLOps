@@ -10,7 +10,6 @@ import argparse
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-from posthog import project_root
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report, precision_score, recall_score,
@@ -37,7 +36,9 @@ def main(args):
     # === MLflow Setup - ESSENTIAL for experiment tracking ===
     # Configure MLflow to use local file-based tracking (not a tracking server)
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    mlruns_path = args.mlflow_uri or f"file://{project_root}/mlruns"  # Local file-based tracking
+    
+    # Use relative path - MLflow handles this correctly on Windows
+    mlruns_path = args.mlflow_uri or "mlruns"
     mlflow.set_tracking_uri(mlruns_path)
     mlflow.set_experiment(args.experiment)  # Creates experiment if doesn't exist
 
@@ -200,13 +201,19 @@ def main(args):
         print(f"   F1 Score: {f1:.3f} | ROC AUC: {roc_auc:.3f}")
 
         # === STAGE 7: Model Serialization and Logging ===
-        print("💾 Saving model to MLflow...")
+        print("💾 Saving model to MLflow artifacts/model/...")
+        
         # ESSENTIAL: Log model in MLflow's standard format for serving
+        # This will create: mlruns/{experiment_id}/{run_id}/artifacts/model/
+        # with all metadata: MLmodel, conda.yaml, requirements.txt, model.pkl, etc.
         mlflow.sklearn.log_model(
-            model, 
-            artifact_path="model"  # This creates a 'model/' folder in MLflow run artifacts
+            sk_model=model,
+            artifact_path="model",  # Creates 'model/' folder in run artifacts
+            registered_model_name=None,  # Don't register to model registry
+            conda_env=None,  # Auto-generate conda environment
+            pip_requirements=None  # Auto-generate pip requirements
         )
-        print("✅ Model saved to MLflow for serving pipeline")
+        print("✅ Model saved to artifacts/model/ with full metadata")
 
         # === Final Performance Summary ===
         print(f"\n⏱️  Performance Summary:")
@@ -221,13 +228,13 @@ def main(args):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="Run churn pipeline with XGBoost + MLflow")
     p.add_argument("--input", type=str, required=True,
-                   help="path to CSV (e.g., data/raw/Telco-Customer-Churn.csv)")
+                   help="path to CSV (e.g., data/raw/WA_Fn-UseC_-Telco-Customer-Churn.csv)")
     p.add_argument("--target", type=str, default="Churn")
     p.add_argument("--threshold", type=float, default=0.35)
     p.add_argument("--test_size", type=float, default=0.2)
     p.add_argument("--experiment", type=str, default="Telco Churn")
     p.add_argument("--mlflow_uri", type=str, default=None,
-                    help="override MLflow tracking URI, else uses project_root/mlruns")
+                    help="override MLflow tracking URI, else uses C:/Users/ulas/Desktop/MLOps/mlruns")
 
     args = p.parse_args()
     main(args)
@@ -236,7 +243,7 @@ if __name__ == "__main__":
 # Use this below to run the pipeline:
 
 python scripts/run_pipeline.py \                                            
-    --input data/raw/Telco-Customer-Churn.csv \
+    --input data/raw/WA_Fn-UseC_-Telco-Customer-Churn.csv \
     --target Churn
 
 """
