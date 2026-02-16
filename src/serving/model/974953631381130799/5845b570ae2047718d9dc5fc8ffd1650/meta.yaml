@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/ulas/Desktop/Telco-Customer-Churn-ML/mlruns/974953631381130799/5845b570ae2047718d9dc5fc8ffd1650/artifacts
+end_time: 1771272817813
+entry_point_name: ''
+experiment_id: '974953631381130799'
+lifecycle_stage: active
+run_id: 5845b570ae2047718d9dc5fc8ffd1650
+run_name: rebellious-slug-959
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1771272817751
+status: 4
+tags: []
+user_id: ulas
