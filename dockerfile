@@ -17,9 +17,10 @@ COPY . .
 COPY src/serving/model /app/src/serving/model
 
 # Copy MLflow run (artifacts + metadata) to the flat /app/model convenience path
-COPY src/serving/model/3b1a41221fc44548aed629fa42b762e0/artifacts/model /app/model
-COPY src/serving/model/3b1a41221fc44548aed629fa42b762e0/artifacts/feature_columns.txt /app/model/feature_columns.txt
-COPY src/serving/model/3b1a41221fc44548aed629fa42b762e0/artifacts/preprocessing.pkl /app/model/preprocessing.pkl
+
+COPY src/serving/model/974953631381130799/models/m-8806bc140ae444d59e6c2b6609b67b9a/artifacts  /app/model
+COPY src/serving/model/974953631381130799/860e768b3baf41e5832ceb20e9b330ba/artifacts/feature_columns.txt /app/model/feature_columns.txt
+COPY src/serving/model/974953631381130799/860e768b3baf41e5832ceb20e9b330ba/artifacts/preprocessing.pkl /app/model/preprocessing.pkl
 
 # make "serving" and "app" importable without the "src." prefix
 # ensures logs are shown in real-time (no buffering).
@@ -29,3 +30,6 @@ ENV PYTHONUNBUFFERED=1 \
 
 
 EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
